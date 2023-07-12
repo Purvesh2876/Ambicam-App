@@ -1,13 +1,77 @@
-import { Box, Grid, GridItem, Heading, Image, Text, VStack } from '@chakra-ui/react';
+
 import { useEffect, useState } from 'react';
 import withAuth from '@/components/withAuth';
 import DesktopHeader from '@component/DesktopHeader';
 import MobileHeader from '@component/MobileHeader';
-
+import { getCustomerCameraList } from './api/getcamera';
+import LiveFeed from '@/components/LiveFeed';
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  Button,
+  IconButton,
+  Spacer,
+  useBreakpointValue,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuDivider,
+  Avatar,
+  AvatarBadge,
+  Grid,
+  GridItem,
+  Image,
+  Divider,
+  VStack,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  useDisclosure,
+  HStack,
+  Link
+} from '@chakra-ui/react';
 const CameraFeedsPage = () => {
-  const [cameraFeeds, setCameraFeeds] = useState([]);
+ 
   const [isMobile, setIsMobile] = useState(false);
+  const [cameraList, setCameraList] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      // JSON.parse(localStorage.getItem('userDetails'));
+      const userDetails = JSON.parse(localStorage.getItem('userDetails'));
+      // console.log(userDetails)
+  
+      const customerId = userDetails.userId;
+      const username = userDetails.email;
+      const langflag = 'en';
+      try {
+        const result = await getCustomerCameraList(customerId, username, langflag);
+        console.log(result)
+        const startIndex = result.indexOf('SUCCESS:') + 'SUCCESS:'.length;
+        const trimmedResult = result.substring(startIndex);
+        const parsedResult = JSON.parse(trimmedResult);
+        setCameraList(parsedResult);
+      } catch (error) {
+        console.error('Error fetching camera list:', error);
+      }
+    };
 
+    fetchData();
+  }, []);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handlePlay = () => {
+    setIsPlaying(true);
+  };
+
+  const handlePause = () => {
+    setIsPlaying(false);
+  };
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -20,43 +84,6 @@ const CameraFeedsPage = () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-  useEffect(() => {
-    // Simulating API call to fetch camera feeds
-    const fetchCameraFeeds = async () => {
-      // Make API call to fetch camera feeds data
-      // const response = await fetch('/api/camera-feeds');
-      // const data = await response.json();
-      // setCameraFeeds(data);
-
-      // Dummy camera feeds data for testing
-      const dummyData = [
-        {
-          id: 1,
-          name: 'Living Room',
-          image: 'https://via.placeholder.com/400x300',
-        },
-        {
-          id: 2,
-          name: 'Bedroom',
-          image: 'https://via.placeholder.com/400x300',
-        },
-        {
-          id: 3,
-          name: 'Kitchen',
-          image: 'https://via.placeholder.com/400x300',
-        },
-        {
-          id: 4,
-          name: 'Backyard',
-          image: 'https://via.placeholder.com/400x300',
-        },
-      ];
-      setCameraFeeds(dummyData);
-    };
-
-    fetchCameraFeeds();
-  }, []);
-
   return (
     <Box>
        {/* Mobile Header */}
@@ -68,31 +95,42 @@ const CameraFeedsPage = () => {
       {/* Desktop Header */}
       {!isMobile && (
         <DesktopHeader/>  )}
-      <Box marginTop={isMobile ? '5rem' : '0'} paddingLeft={3} paddingRight={3}>
+
+        
+      <Box marginTop={isMobile ? '5rem' : '5rem'} paddingLeft={3} paddingRight={3}>
           <Heading size="lg" mb={4}>
-            Camera Feeds
+            Camera Multiple-View Feeds
           </Heading>
 
           <Grid templateColumns="repeat(auto-fit, minmax(300px, 1fr))" gap={4} >
-            {cameraFeeds.map((feed) => (
-              <GridItem key={feed.id}>
-                <Box
-                  bg="white"
-                  borderRadius="md"
-                  p={4}
-                  boxShadow="md"
-                  transition="box-shadow 0.3s"
-                  _hover={{ boxShadow: 'lg' }}
-                >
-                  <Image src={feed.image} alt={feed.name} borderRadius="md" mb={4} />
-
-                  <VStack spacing={2} align="start">
-                    <Heading size="md">{feed.name}</Heading>
-                    <Text color="gray.500">Last Activity: 1 hour ago</Text>
-                  </VStack>
-                </Box>
-              </GridItem>
+          {cameraList.map((camera) => (
+            <GridItem key={camera.cameraid}>
+              <Box
+                bg="white"
+                borderRadius="md"
+                p={4}
+                boxShadow="md"
+                transition="box-shadow 0.3s"
+                _hover={{ boxShadow: 'lg' }}
+              >
+                
+                {/* <Image src="https://via.placeholder.com/240x160" alt="Camera" borderRadius="md" mb={4} /> */}
+                <LiveFeed
+              source={`https://media1.ambicam.com:443/dvr30/${camera.streamname}/index.m3u8`}
+              isPlaying={isPlaying}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              />
+    
+                <Text fontWeight="bold" fontSize="xl" mb={2}>
+                {camera.cameraname}
+                </Text>
+                
+              
+              </Box>
+            </GridItem>
             ))}
+           
           </Grid>
     </Box>
     </Box>
