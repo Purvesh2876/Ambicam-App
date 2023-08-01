@@ -1,9 +1,10 @@
-import { Box, Button, Collapse, FormControl, FormLabel, Input, VStack } from '@chakra-ui/react';
+import { Box, Button, Checkbox, Collapse, Flex, FormControl, FormLabel, Heading, Input, Text, Stack, VStack, useColorModeValue, Img } from '@chakra-ui/react';
 import { useState,useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image'
 import logo from '@img/logo.png'
 import {login} from './api/login'
+import ambicam from '@img/ambicam.png'
 
 const LoginPage = () => {
   const [isLoginOpen, setLoginOpen] = useState(false);
@@ -34,30 +35,37 @@ const LoginPage = () => {
   };
 
 
+  const [isLoading, setIsLoading] = useState(false); // State variable to track loading state
+  const [redirectToDashboard, setRedirectToDashboard] = useState(false); // State variable to track redirection
+
   const handleLogin = async () => {
     try {
+      setIsLoading(true); // Show loading animation
+
       // Call the login function and pass the email, password, and langflag
       const loginResult = await login(email, password, 'en');
 
       const [status, userId] = loginResult.split(':');
-      const userDetails={
-        status,userId,email
-      }
-      console.log(userDetails)
+      const userDetails = {
+        status,
+        userId,
+        email,
+      };
+      console.log(userDetails);
 
       // Check if the login was successful
       if (userDetails.status === 'SUCCESS') {
         const token = loginResult.substring('SUCCESS:'.length);
- 
-          localStorage.setItem('userDetails', JSON.stringify(userDetails));
-          localStorage.setItem('userId', userId);
-          localStorage.setItem('email', email);
-          
-          // Store the token in local storage
-          localStorage.setItem('isLoggedIn', true);
-          localStorage.setItem('token', token);
-        // Redirect to the dashboard or any other protected page
-        router.push('/dashboard');
+
+        localStorage.setItem('userDetails', JSON.stringify(userDetails));
+        localStorage.setItem('userId', userId);
+        localStorage.setItem('email', email);
+
+        // Store the token in local storage
+        localStorage.setItem('isLoggedIn', true);
+        localStorage.setItem('token', token);
+        
+        setRedirectToDashboard(true); // Set the state variable to trigger redirection
       } else {
         // Show an error message or perform any other action for failed login
         console.log('Login failed');
@@ -65,8 +73,18 @@ const LoginPage = () => {
     } catch (error) {
       // Handle any errors that occur during the login process
       console.error('Error:', error);
+    } finally {
+      setIsLoading(false); // Hide loading animation
     }
   };
+
+  // Use useEffect to watch for changes in the redirectToDashboard state
+  useEffect(() => {
+    if (redirectToDashboard) {
+      // Redirect to the dashboard or any other protected page
+      router.push('/SidebarWithHeader');
+    }
+  }, [redirectToDashboard]);
   
 
   // const handleLogin = () => {
@@ -84,72 +102,65 @@ const LoginPage = () => {
   // };
 
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="gray.50">
-      <VStack spacing={8} width="400px" p={8}  rounded="lg" shadow="lg">
-        <Box>
-          <Image src={logo} alt="Website Logo" />
-        </Box>
-        <Collapse in={isLoginOpen} animateOpacity>
-          <VStack spacing={4} width="100%" align="stretch">
-            <FormControl id="email">
-              <FormLabel>Email address</FormLabel>
-              <Input
-                type="email"
+    <Flex
+    minH={'100vh'}
+    align={'center'}
+    justify={'center'}
+    bg={useColorModeValue('gray.50', 'gray.800')}>
+    <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+      <Stack align={'center'}>
+        <Image src={logo} alt='ambicam logo' />
+        <Heading fontSize={'4xl'}>Sign in to your account</Heading>
+        <div style={{display:"flex"}}>
+        <Text fontSize={'lg'} color={'gray.600'}>
+          to enjoy all of our cool <span style={{color:"#4299E1"}}>features</span>
+        </Text>
+        </div>
+      </Stack>
+      <Box
+        rounded={'lg'}
+        bg={useColorModeValue('white', 'gray.700')}
+        boxShadow={'lg'}
+        p={8}>
+        <Stack spacing={4}>
+          <FormControl id="email">
+            <FormLabel>Email address</FormLabel>
+            <Input type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)} 
-              />
-            </FormControl>
-            <FormControl id="password">
-              <FormLabel>Password</FormLabel>
-              <Input
-                type="password"
+                onChange={(e) => setEmail(e.target.value)}  />
+          </FormControl>
+          <FormControl id="password">
+            <FormLabel>Password</FormLabel>
+            <Input type="password"
                 placeholder="Enter your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </FormControl>
-            {/* <FormControl id="langflag">
-        <FormLabel>Lang Flag</FormLabel>
-        <Input
-          type="text"
-          placeholder="Enter lang flag"
-          value={langflag}
-          onChange={(e) => setLangFlag(e.target.value)}
-        />
-      </FormControl> */}
-            <Button colorScheme="teal" size="lg" width="100%" onClick={handleLogin}>
-              Sign In
-            </Button>
-          </VStack>
-        </Collapse>
-        <Collapse in={isSignUpOpen} animateOpacity>
-          <VStack spacing={4} width="100%" align="stretch">
-            <FormControl id="name">
-              <FormLabel>Name</FormLabel>
-              <Input type="text" placeholder="Enter your name" />
-            </FormControl>
-            <FormControl id="email">
-              <FormLabel>Email address</FormLabel>
-              <Input type="email" placeholder="Enter your email" />
-            </FormControl>
-            <FormControl id="password">
-              <FormLabel>Password</FormLabel>
-              <Input type="password" placeholder="Enter your password" />
-            </FormControl>
-            <Button colorScheme="teal" size="lg" width="100%">
-              Sign Up
-            </Button>
-          </VStack>
-        </Collapse>
-        <Button colorScheme="teal" size="lg" width="100%" onClick={handleLoginClick}>
-          Sign In
-        </Button>
-        <Button colorScheme="teal" size="lg" width="100%" onClick={handleSignUpClick}>
-          Sign Up
-        </Button>
-      </VStack>
-    </Box>
+                onChange={(e) => setPassword(e.target.value)} />
+          </FormControl>
+          <Stack spacing={10}>
+            <Stack
+              direction={{ base: 'column', sm: 'row' }}
+              align={'start'}
+              justify={'space-between'}>
+              <Checkbox>Remember me</Checkbox>
+              <Text color={'blue.400'}>Forgot password?</Text>
+            </Stack>
+            <Button
+      bg={'blue.400'}
+      color={'white'}
+      _hover={{
+        bg: 'blue.500',
+      }}
+      isLoading={isLoading} // Use the isLoading prop to show/hide the loading animation
+      onClick={handleLogin}
+    >
+      Sign in
+    </Button>
+          </Stack>
+        </Stack>
+      </Box>
+    </Stack>
+  </Flex>
   );
 };
 
