@@ -12,20 +12,20 @@ import { AiOutlineHeatMap } from 'react-icons/ai';
 import { FiSettings } from 'react-icons/fi';
 import Image from 'next/image'
 import ambicam from '@img/ambicam.png'
+import ambicam1 from '@img/Ambicam1.png'
 
 
 const NavItem = ({ icon, children, ...rest }) => {
-  
   return (
     <Box
       as="a"
       href="#"
       style={{ textDecoration: 'none' }}
       _focus={{ boxShadow: 'none' }}
-      
     >
       <Flex
         align="center"
+        flexDir="column" // Added flex direction column
         p="4"
         mx="4"
         borderRadius="lg"
@@ -39,7 +39,7 @@ const NavItem = ({ icon, children, ...rest }) => {
       >
         {icon && (
           <Icon
-            mr="4"
+            mb="2" // Added margin-bottom to separate icon and text
             fontSize="16"
             _groupHover={{
               color: 'white',
@@ -47,11 +47,12 @@ const NavItem = ({ icon, children, ...rest }) => {
             as={icon}
           />
         )}
-        {children}
+        <Text  fontSize="10" >{children}</Text> {/* Display the link.name here */}
       </Flex>
     </Box>
   );
 };
+
 
 const LinkItems = [
   { name: 'Cameras', icon: BsCameraVideo },
@@ -68,21 +69,22 @@ const LinkItems = [
 const SidebarContent = ({ onClose, ...rest }) => {
   return (
     <Box
-      transition="3s ease"
-      bg="gray.100"
-      borderRight="1px"
-      borderRightColor="gray.200"
-      w={{ base: 'full', md: 60 }}
-      pos="fixed"
-      h="full"
-      {...rest}
-    >
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+    transition="3s ease"
+    bg="gray.100"
+    borderRight="1px"
+    borderRightColor="gray.200"
+    boxSize={{ base: 'full', md: '5rem' }} // Set width to 5rem on larger screens
+    display={{ base: 'none', md: 'block' }} // Use display prop to show on larger screens
+    pos="fixed"
+    h="full"
+    {...rest}
+  >
+      {/* <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          <Image src={ambicam} alt='ambicam logo' />
+          <Image style={{width:'50px'}} src={ambicam1} alt='ambicam logo' />
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
-      </Flex>
+      </Flex> */}
       {LinkItems.map((link) => (
         <NavItem key={link.name} icon={link.icon}>
           {link.name}

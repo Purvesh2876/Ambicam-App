@@ -86,7 +86,7 @@ const CameraList = () => {
       <Box flex={2} pt={4} pb={4} minWidth={{ base: '100%', md: 'initial' }}>
         {/* Add your table here */}
         {/* For example: */}
-        <Heading size="lg">Camera Table</Heading>
+        <Heading size="lg" pl={8}>Camera Table</Heading>
         <DashboardTable cameraList={cameraList} />
       </Box>
 
@@ -101,7 +101,7 @@ const CameraList = () => {
           </Button>
         </Flex>
 
-        <Grid templateColumns="repeat(auto-fill, minmax(240px, 1fr))" gap={1} mt={8} ml={0}>
+        <Grid templateColumns="repeat(auto-fill, minmax(280px, 1fr))" gap={1} mt={8} ml={0}>
           {/* Camera Card 1 */}
           {sortedCameraList.map((camera) => (
             <GridItem key={camera.cameraid}>

@@ -10,6 +10,7 @@ import CameraList from './CameraList';
 import Image from 'next/image'
 import ambicam from '@img/ambicam.png'
 import { useRouter } from 'next/router';
+import Header from '@/components/Header';
 
 
 const MobileNav = ({ onOpen, ...rest }) => {
@@ -49,10 +50,12 @@ const MobileNav = ({ onOpen, ...rest }) => {
         fontSize="2xl"
         fontFamily="monospace"
         fontWeight="bold"
+        textAlign='center'
+        alignItems="center"
       >
-        Logo
+        <Image style={{width:'75%'}} src={ambicam} alt='ambicam logo' />
       </Text>
-
+      
       <HStack spacing={{ base: '0', md: '6' }}>
         <IconButton size="lg" variant="ghost" aria-label="open menu" icon={<FiBell />} />
         <Flex alignItems="center">
@@ -93,14 +96,15 @@ const SidebarWithHeader = () => {
 
   return (
     <Box minH="100vh" bg="gray.100">
+      <Header />
       <SidebarContent onClose={() => onClose} display={{ base: 'none', md: 'block' }} />
-      <Drawer isOpen={isOpen} placement="left" onClose={onClose} returnFocusOnClose={false} onOverlayClick={onClose} size="full">
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose} returnFocusOnClose={false} onOverlayClick={onClose} size="md">
         <DrawerContent>
           <SidebarContent onClose={onClose} />
         </DrawerContent>
       </Drawer>
-      <MobileNav onOpen={onOpen} />
-      <Box ml={{ base: 0, md: 60 }} p="4">
+      {/* <MobileNav onOpen={onOpen} /> */}
+      <Box ml={{ base: 0, md: '5rem' }} p="4">
         <CameraList />
       </Box>
     </Box>

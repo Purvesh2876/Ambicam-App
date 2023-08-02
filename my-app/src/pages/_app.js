@@ -60,7 +60,12 @@ export default function App({ Component, pageProps }) {
           </Skeleton> 
         </div>
       )}
+
        {appInitialized && !showLoader && <Component {...pageProps} />}
+
+
+
+
       <style jsx>{`
         .loader-container {
           display: none;
